@@ -224,7 +224,7 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
         </Grid>
       <Card variant="outlined">
         <CardContent>
-		<Typography variant="h6" gutterBottom>Количество артефактов</Typography>
+		<Typography variant="h6" gutterBottom>Количество артефактов ({selectedArtifacts.length})</Typography>
 			{Object.entries(artifactCounts).map(([artifact, count]) => (
 			  <Typography key={artifact}>{artifact}: {count} шт.</Typography>
 			))}
