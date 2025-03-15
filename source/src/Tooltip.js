@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 export default function Tooltip({ children }) {
   const [tooltip, setTooltip] = useState({ content: null, visible: false, x: 0, y: 0, opacity: 0 });
   const tooltipRef = useRef(null);
-  const targetRef = useRef(null); // Реф на целевой элемент
+  const targetRef = useRef(null); // Ref to the target element
 
   const handleMouseEnter = (event, content, target) => {
     targetRef.current = target;
@@ -47,30 +47,45 @@ export default function Tooltip({ children }) {
     }));
   };
 
-  const handleMouseLeave = (event) => {
-    // Проверяем, если курсор все еще над целевым элементом или тултипом — не скрываем его
-    if (
-      targetRef.current?.contains(event.relatedTarget) ||
-      tooltipRef.current?.contains(event.relatedTarget)
-    ) {
-      return;
-    }
-
+  const handleMouseLeave = () => {
+    // Hide the tooltip when the mouse leaves the target element
     setTooltip((prev) => ({ ...prev, opacity: 0 }));
     setTimeout(() => {
       setTooltip({ content: null, visible: false, x: 0, y: 0, opacity: 0 });
     }, 200);
   };
 
-  useEffect(() => {
-    if (tooltip.visible && tooltipRef.current) {
-      const { width, height } = tooltipRef.current.getBoundingClientRect();
-      setTooltip((prev) => ({
-        ...prev,
-        width,
-        height,
-      }));
+  const checkMousePosition = (event) => {
+    const tooltipElement = tooltipRef.current;
+    const targetElement = targetRef.current;
+
+    if (!tooltip.visible || !tooltipElement || !targetElement) return;
+
+    const tooltipRect = tooltipElement.getBoundingClientRect();
+    const targetRect = targetElement.getBoundingClientRect();
+
+    // Check if mouse is within the bounds of the tooltip or target element
+    const isMouseInside =
+      (event.clientX >= targetRect.left && event.clientX <= targetRect.right &&
+       event.clientY >= targetRect.top && event.clientY <= targetRect.bottom);
+
+    if (!isMouseInside) {
+      // Hide tooltip if mouse is outside both elements
+      setTooltip((prev) => ({ ...prev, opacity: 0 }));
+      setTimeout(() => {
+        setTooltip({ content: null, visible: false, x: 0, y: 0, opacity: 0 });
+      }, 200);
     }
+  };
+
+  useEffect(() => {
+    // Add mousemove event listener to check mouse position
+    window.addEventListener('mousemove', checkMousePosition);
+    
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('mousemove', checkMousePosition);
+    };
   }, [tooltip.visible]);
 
   return (
@@ -78,6 +93,7 @@ export default function Tooltip({ children }) {
       {React.Children.map(children, (child) =>
         child.props.tooltip
           ? cloneElement(child, {
+			   ref: targetRef,
               onMouseEnter: (e) => handleMouseEnter(e, child.props.tooltip, e.currentTarget),
               onMouseMove: handleMouseMove,
               onMouseLeave: handleMouseLeave,
@@ -90,7 +106,7 @@ export default function Tooltip({ children }) {
           <div
             ref={tooltipRef}
             className="tooltip"
-            onMouseLeave={handleMouseLeave} // Добавляем обработчик ухода курсора с тултипа
+            onMouseLeave={handleMouseLeave} // Add mouse leave handler for tooltip
             style={{
               position: "fixed",
               left: `${tooltip.x}px`,
