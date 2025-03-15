@@ -162,7 +162,10 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
 
   return (
   <>
-        <Drawer variant="permanent" anchor="left" style={{ width: '400px' }}>
+
+<Container maxWidth="lg" className="p-4" style={{ display: 'flex' }}>
+
+<Drawer variant="permanent" anchor="left" style={{ width: '400px' }}>
         <Typography variant="h6" gutterBottom style={{ padding: '10px' }}>Список артефактов</Typography>
 		<Grid container spacing={2} className="mb-4" style={{ width: '500px' }}>
         {artifacts.map((artifact, index) => (
@@ -178,10 +181,8 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
 		
 		</Grid>
       </Drawer>
-
-
-
-      <Container maxWidth="lg">
+      <Container maxWidth="md">
+	          
         <Typography variant="h5" gutterBottom>Калькулятор артефактов</Typography>
         <Grid container spacing={2} className="mb-4">
           {selectedArtifacts.map((artifact, index) => (
@@ -254,8 +255,12 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
                 <MenuItem key={name} value={name}>{name}</MenuItem>
               ))}
             </Select>
+			 <Button variant="contained" color="error" onClick={() => deleteBuild(selectedTemplate!= "" ? selectedTemplate : prompt("Введите название шаблона для удаления"))}>
+            Удалить шаблон
+          </Button>
           </CardContent>
         </Card>
+      </Container>
       </Container>
 
 	</>
