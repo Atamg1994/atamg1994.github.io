@@ -24,14 +24,8 @@ yarn-error.log*
 package-lock.json
 package-lock.json
 package.json
-public/artifacts.csv
-src/App.js
 src/Текстовый документ.txt
-src/App.js
 src/pages/ArtifactCalculator.js
-src/App.css
-src/App.js
-src/App.css
 package.json
 package-lock.json
 package.json
