@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState,useEffect } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, TextField, Card, CardContent, Typography, Grid, Container } from '@mui/material';
+import { Button, Select, MenuItem, TextField, Card, CardContent, Typography, Grid, Container, Drawer } from '@mui/material';
 import Papa from "papaparse";
 import Tooltip from "./Tooltip";
 
@@ -12,7 +12,7 @@ const ArtifactCalculator = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [savedBuilds, setSavedBuilds] = useState({});
   const [buildName, setBuildName] = useState(""); // State for build name input
-  const [selecdetTemplate, setSelecdetTemplate] = useState(""); // State for build name input
+  const [selectedTemplate, setSelectedTemplate] = useState(""); // State for build name input
 
 
   // Function to load artifacts from the default CSV file
@@ -97,7 +97,7 @@ const ArtifactCalculator = () => {
     delete updatedBuilds[name];
     setSavedBuilds(updatedBuilds);
     localStorage.setItem("savedBuilds", JSON.stringify(updatedBuilds));
-	setSelecdetTemplate("");
+	setSelectedTemplate("");
   };
 
   const handleFileUpload = (event) => {
@@ -161,18 +161,34 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
   });
 
   return (
-    <Container maxWidth="md" className="p-4">
-      <Typography variant="h5" gutterBottom>
-        Калькулятор артефактов
-        <input type="file" accept=".csv" onChange={handleFileUpload} className="mb-4" />
-      </Typography>
+  <>
+        <Drawer variant="permanent" anchor="left" style={{ width: '400px' }}>
+        <Typography variant="h6" gutterBottom style={{ padding: '10px' }}>Список артефактов</Typography>
+		<Grid container spacing={2} className="mb-4" style={{ width: '500px' }}>
+        {artifacts.map((artifact, index) => (
+		<Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
+          <Card key={index} variant="outlined" onClick={() => selectArtifact(artifact)} style={{ margin: '0.5px', cursor: 'pointer' }}>
+            <div>
+              <Typography variant="body1">{artifact.name}</Typography>
+              <Typography variant="body2">Тир {artifact.tier}</Typography>
+            </div>
+          </Card>
+		  </Grid>
+        ))}
+		
+		</Grid>
+      </Drawer>
 
-      <Grid container spacing={2} className="mb-4">
-        {selectedArtifacts.map((artifact, index) => (
-          <Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
-            <Card variant="outlined">
+
+
+      <Container maxWidth="lg">
+        <Typography variant="h5" gutterBottom>Калькулятор артефактов</Typography>
+        <Grid container spacing={2} className="mb-4">
+          {selectedArtifacts.map((artifact, index) => (
+            <Grid item xs={12 / 5} key={`${artifact.name}-${index}`}>
+            <div variant="outlined" style={{ margin: '0.5px', cursor: 'pointer' }}>
 			<Tooltip>
-              <CardContent tooltip={
+              <div tooltip={
 						  <>
 							<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
 							{Object.entries(artifacts.find(a => a.name === artifact.name && a.tier === artifact.tier)||{}).map(([key, value]) => {
@@ -199,52 +215,12 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
                 <Button variant="contained" color="error" onClick={() => removeArtifact(index)}>Удалить</Button>
                 <Button variant="contained" color="error" onClick={() => selectArtifact(artifact)}>+</Button>
 				
-              </CardContent>
+              </div>
 			</Tooltip>
-            </Card>
-          </Grid>
-        ))}
-        <Grid item xs={12}>
-          <Button variant="outlined" onClick={() => setOpenDialog(true)}>Добавить артефакт</Button>
-          <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-            <DialogTitle>Выберите артефакт</DialogTitle>
-            <DialogContent>
-              <Grid container spacing={2} className="mb-4">
-                {groupedArtifacts.map((tierArtifacts, tierIndex) => (
-                  <Grid item xs={12 / MAX_TIERS} key={tierIndex}>
-                    <Typography variant="subtitle1">Тир {tierIndex + 1}</Typography>
-                    {tierArtifacts.map((artifact,index) => (
-                      <Card
-                        key={`${artifact.name}-${index}-${tierIndex}`}
-                        variant="outlined"
-                        onClick={() => selectArtifact(artifact)}
-                        style={{ cursor: 'pointer' }}
-                      >
-						<Tooltip>
-							<div     tooltip={
-										  <>
-											<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
-											{Object.entries(artifact).map(([key, value]) => 
-											  value !== 0 && ![ "tier", "№"].includes(key) && <Typography key={key}>{key}: {value}</Typography>
-											)}
-										  </>
-							}>
-							  <Typography variant="body1">{artifact.name}</Typography>
-							  <Typography variant="body1">{`Тир ${artifact.tier}`}</Typography>
-							</div>
-						</Tooltip>
-                      </Card>
-                    ))}
-                  </Grid>
-                ))}
-              </Grid>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenDialog(false)}>Закрыть</Button>
-            </DialogActions>
-          </Dialog>
+            </div>
+            </Grid>
+          ))}
         </Grid>
-      </Grid>
       <Card variant="outlined">
         <CardContent>
 		<Typography variant="h6" gutterBottom>Количество артефактов</Typography>
@@ -255,38 +231,34 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
           {Object.entries(stats).map(([key, value]) => value !== 0 && <Typography key={key}>{key}: {value}</Typography>)}
         </CardContent>
       </Card>
-      <div className="flex flex-col gap-2 mt-4">
-        <TextField
-          value={buildName}
-          onChange={(e) => setBuildName(e.target.value)}
-          label="Введите название шаблона"
-          variant="outlined"
-          fullWidth
-        />
-        <div className="flex gap-2">
-          <Button variant="outlined" onClick={() => setSelectedArtifacts([])}>Сбросить</Button>
-          <Button variant="contained" onClick={() => saveBuild(buildName)}>Сохранить шаблон</Button>
-          <Select
-            onChange={(e) => {loadBuild(e.target.value)
-			setSelecdetTemplate(e.target.value);
-			}
-			
-			}
-            displayEmpty
-            variant="outlined"
-			value = {selecdetTemplate}
-          >
-            <MenuItem value="">Загрузить шаблон (не выбран)</MenuItem>
-            {Object.keys(savedBuilds).map((name) => (
-              <MenuItem key={name} value={name}>{name}</MenuItem>
-            ))}
-          </Select>
-          <Button variant="contained" color="error" onClick={() => deleteBuild(selecdetTemplate!= "" ? selecdetTemplate : prompt("Введите название шаблона для удаления"))}>
-            Удалить шаблон
-          </Button>
-        </div>
-      </div>
-    </Container>
+        <Card variant="outlined">
+          <CardContent>
+            <Typography variant="h6" gutterBottom>Сохраненные шаблоны</Typography>
+            <TextField
+              value={buildName}
+              onChange={(e) => setBuildName(e.target.value)}
+              label="Введите название шаблона"
+              variant="outlined"
+              fullWidth
+            />
+            <Button variant="contained" onClick={() => saveBuild(buildName)}>Сохранить шаблон</Button>
+            <Select
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+              displayEmpty
+              variant="outlined"
+              fullWidth
+              value={selectedTemplate}
+            >
+              <MenuItem value="">Загрузить шаблон (не выбран)</MenuItem>
+              {Object.keys(savedBuilds).map((name) => (
+                <MenuItem key={name} value={name}>{name}</MenuItem>
+              ))}
+            </Select>
+          </CardContent>
+        </Card>
+      </Container>
+
+	</>
   );
 };
  

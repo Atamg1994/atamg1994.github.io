@@ -4,8 +4,10 @@ import { createPortal } from "react-dom";
 export default function Tooltip({ children }) {
   const [tooltip, setTooltip] = useState({ content: null, visible: false, x: 0, y: 0, opacity: 0 });
   const tooltipRef = useRef(null);
+  const targetRef = useRef(null); // Реф на целевой элемент
 
-  const handleMouseEnter = (event, content) => {
+  const handleMouseEnter = (event, content, target) => {
+    targetRef.current = target;
     setTooltip({
       content,
       visible: true,
@@ -16,7 +18,7 @@ export default function Tooltip({ children }) {
 
     setTimeout(() => {
       setTooltip((prev) => ({ ...prev, opacity: 1 }));
-    }, 50); // Плавное появление
+    }, 50);
   };
 
   const handleMouseMove = (event) => {
@@ -45,11 +47,19 @@ export default function Tooltip({ children }) {
     }));
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event) => {
+    // Проверяем, если курсор все еще над целевым элементом или тултипом — не скрываем его
+    if (
+      targetRef.current?.contains(event.relatedTarget) ||
+      tooltipRef.current?.contains(event.relatedTarget)
+    ) {
+      return;
+    }
+
     setTooltip((prev) => ({ ...prev, opacity: 0 }));
     setTimeout(() => {
       setTooltip({ content: null, visible: false, x: 0, y: 0, opacity: 0 });
-    }, 200); // Плавное исчезновение
+    }, 200);
   };
 
   useEffect(() => {
@@ -68,7 +78,7 @@ export default function Tooltip({ children }) {
       {React.Children.map(children, (child) =>
         child.props.tooltip
           ? cloneElement(child, {
-              onMouseEnter: (e) => handleMouseEnter(e, child.props.tooltip),
+              onMouseEnter: (e) => handleMouseEnter(e, child.props.tooltip, e.currentTarget),
               onMouseMove: handleMouseMove,
               onMouseLeave: handleMouseLeave,
             })
@@ -80,6 +90,7 @@ export default function Tooltip({ children }) {
           <div
             ref={tooltipRef}
             className="tooltip"
+            onMouseLeave={handleMouseLeave} // Добавляем обработчик ухода курсора с тултипа
             style={{
               position: "fixed",
               left: `${tooltip.x}px`,
