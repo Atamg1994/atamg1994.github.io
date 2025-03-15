@@ -30,11 +30,13 @@ export default function Tooltip({ children }) {
     let x = event.clientX;
     let y = event.clientY + 10;
 
-    if (x + tooltipWidth > window.innerWidth) {
-      x = event.clientX - tooltipWidth - 10;
-    } else if (x - tooltipWidth < 0) {
-      x = event.clientX + 10;
+    if ((tooltipWidth/2)+10 > event.clientX) {
+      x += (tooltipWidth/2)+10 - event.clientX; // Смещаем влево
+
     }
+
+
+   
 
     if (y + tooltipHeight > window.innerHeight) {
       y = event.clientY - tooltipHeight - 10;
