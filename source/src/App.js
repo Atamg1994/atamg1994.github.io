@@ -167,13 +167,16 @@ const ArtifactCalculator = () => {
             <Card variant="outlined">
 			<Tooltip>
               <CardContent tooltip={
-										  <>
-											<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
-											{Object.entries(artifact).map(([key, value]) => 
-											  value !== 0 && ![ "tier", "№"].includes(key) && <Typography key={key}>{key}: {value}</Typography>
-											)}
-										  </>
-							}>
+						  <>
+							<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
+							{Object.entries(artifact).map(([key, value]) => {
+							  const fullArtifact = artifacts.find(a => a.name === artifact.name && a.tier === artifact.tier);
+							  return value !== 0 && !["tier", "№"].includes(key) ? (
+								<Typography key={key}>{key}: {value}</Typography>
+							  ) : null;
+							})}
+						  </>
+						}>
                 <Typography variant="h6" align="center">{artifact.name}</Typography>
                 <Select
                   value={artifact.tier}
