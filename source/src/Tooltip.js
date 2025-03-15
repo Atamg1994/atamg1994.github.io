@@ -41,7 +41,7 @@ export default function Tooltip({ children }) {
     if (y + tooltipHeight > window.innerHeight) {
       y = event.clientY - tooltipHeight - 10;
     }
-console.log([tooltipWidth,tooltipHeight,window.innerWidth,window.innerHeight,x,y])
+//console.log([tooltipWidth,tooltipHeight,window.innerWidth,window.innerHeight,x,y])
     setTooltip((prev) => ({
       ...prev,
       x,

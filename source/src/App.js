@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState,useEffect } from "react";
-import { Button, Select, MenuItem, TextField, Card, CardContent, Typography, Grid, Container, Drawer } from '@mui/material';
+import { Button, Select, MenuItem, TextField, Card, CardContent, Typography, Grid, Container, Drawer, FormControlLabel, Checkbox } from '@mui/material';
 import Papa from "papaparse";
 import Tooltip from "./Tooltip";
 
@@ -11,6 +11,7 @@ const ArtifactCalculator = () => {
   const [artifacts, setArtifacts] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [savedBuilds, setSavedBuilds] = useState({});
+  const [filterStats, setFilterStats] = useState({});
   const [buildName, setBuildName] = useState(""); // State for build name input
   const [selectedTemplate, setSelectedTemplate] = useState(""); // State for build name input
 
@@ -159,16 +160,48 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
     const tierIndex = Math.min(artifact.tier - 1, MAX_TIERS - 1);
     groupedArtifacts[tierIndex].push(artifact);
   });
+  
+  
+    const uniqueStats = [...new Set(artifacts.flatMap(a => Object.keys(a)))].filter(stat => !["name", "tier", "Имя", "Тир", "№","Сколько?"].includes(stat));
+
+  const handleStatFilterChange = (stat) => {
+    setFilterStats(prev => ({ ...prev, [stat]: !prev[stat] }));
+  };
+
+  const filteredArtifacts = artifacts.filter(artifact =>
+    Object.entries(filterStats).every(([stat, isChecked]) => !isChecked || (artifact[stat] > 0 || artifact[stat] < 0))
+  );
+  
+  
+  
 
   return (
   <>
 
 <Container maxWidth="lg" className="p-4" style={{ display: 'flex' }}>
 
-<Drawer variant="permanent" anchor="left" style={{ width: '400px' }}>
+<Drawer variant="permanent" anchor="left" style={{ width: '500px' }}>
         <Typography variant="h6" gutterBottom style={{ padding: '10px' }}>Список артефактов</Typography>
+		<Typography variant="subtitle1">Фильтр по статам:</Typography>
+<Container maxWidth="lg" className="p-4" style={{
+    display: 'flex',
+    width: '500px',
+    overflowWrap: 'break-word', // Лучше чем wordWrap
+    flexWrap: 'wrap',
+    alignContent: 'space-around',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start'
+}}>
+          {uniqueStats.map(stat => (
+            <FormControlLabel style={{border: "1px solid" }}
+              key={stat}
+              control={<Checkbox checked={!!filterStats[stat]} onChange={() => handleStatFilterChange(stat)} />}
+              label={<Typography style={{ whiteSpace: 'normal', wordWrap: 'break-word', width: '100px'  }}>{stat}</Typography>}
+            />
+          ))}
+		</Container>
 		<Grid container spacing={2} className="mb-4" style={{ width: '500px' }}>
-        {artifacts.map((artifact, index) => (
+        {filteredArtifacts.map((artifact, index) => (
 		<Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
 		<Tooltip>
           <Card
