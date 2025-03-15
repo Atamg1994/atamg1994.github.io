@@ -131,6 +131,12 @@ const ArtifactCalculator = () => {
     }
   };
 
+const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
+  const key = `${artifact.name} (Тир ${artifact.tier})`;
+  acc[key] = (acc[key] || 0) + 1;
+  return acc;
+}, {});
+
   const calculateStats = () => {
     return selectedArtifacts.reduce((acc, artifact) => {
       const fullArtifact = artifacts.find(a => a.name === artifact.name && a.tier === artifact.tier);
@@ -241,6 +247,10 @@ const ArtifactCalculator = () => {
       </Grid>
       <Card variant="outlined">
         <CardContent>
+		<Typography variant="h6" gutterBottom>Количество артефактов</Typography>
+			{Object.entries(artifactCounts).map(([artifact, count]) => (
+			  <Typography key={artifact}>{artifact}: {count} шт.</Typography>
+			))}
           <Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
           {Object.entries(stats).map(([key, value]) => value !== 0 && <Typography key={key}>{key}: {value}</Typography>)}
         </CardContent>
