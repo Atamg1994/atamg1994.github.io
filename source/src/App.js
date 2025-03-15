@@ -191,6 +191,8 @@ const ArtifactCalculator = () => {
                   ))}
                 </Select>
                 <Button variant="contained" color="error" onClick={() => removeArtifact(index)}>Удалить</Button>
+                <Button variant="contained" color="error" onClick={() => selectArtifact(artifact)}>+</Button>
+				
               </CardContent>
 			</Tooltip>
             </Card>
@@ -213,7 +215,7 @@ const ArtifactCalculator = () => {
                         style={{ cursor: 'pointer' }}
                       >
 						<Tooltip>
-							<CardContent     tooltip={
+							<div     tooltip={
 										  <>
 											<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
 											{Object.entries(artifact).map(([key, value]) => 
@@ -222,8 +224,8 @@ const ArtifactCalculator = () => {
 										  </>
 							}>
 							  <Typography variant="body1">{artifact.name}</Typography>
-							  <Typography variant="body2">{`Тир ${artifact.tier}`}</Typography>
-							</CardContent>
+							  <Typography variant="body1">{`Тир ${artifact.tier}`}</Typography>
+							</div>
 						</Tooltip>
                       </Card>
                     ))}
