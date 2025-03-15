@@ -200,10 +200,10 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
         <Typography variant="h5" gutterBottom>Калькулятор артефактов</Typography>
         <Grid container spacing={2} className="mb-4">
           {selectedArtifacts.map((artifact, index) => (
-            <Grid item xs={12 / 5} key={`${artifact.name}-${index}`}>
-            <div variant="outlined" style={{ margin: '0.5px', cursor: 'pointer' }}>
+            <Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
+            <Card variant="outlined" style={{ margin: '0.5px', cursor: 'pointer' }}>
 			<Tooltip>
-              <div tooltip={
+              <CardContent style={{ margin: '0.5px', padding: '0.5px' }} tooltip={
 						  <>
 							<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
 							{Object.entries(artifacts.find(a => a.name === artifact.name && a.tier === artifact.tier)||{}).map(([key, value]) => {
@@ -227,12 +227,14 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
                     <MenuItem key={tier + 1} value={tier + 1}>{`Тир ${tier + 1}`}</MenuItem>
                   ))}
                 </Select>
+				<div style={{ display: 'flex' }}>
                 <Button variant="contained" color="error" onClick={() => removeArtifact(index)}>Удалить</Button>
                 <Button variant="contained" color="error" onClick={() => selectArtifact(artifact)}>+</Button>
+				</div>
 				
-              </div>
+              </CardContent>
 			</Tooltip>
-            </div>
+            </Card>
             </Grid>
           ))}
         </Grid>
