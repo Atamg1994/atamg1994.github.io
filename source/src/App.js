@@ -170,12 +170,26 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
 		<Grid container spacing={2} className="mb-4" style={{ width: '500px' }}>
         {artifacts.map((artifact, index) => (
 		<Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
-          <Card key={index} variant="outlined" onClick={() => selectArtifact(artifact)} style={{ margin: '0.5px', cursor: 'pointer' }}>
+		<Tooltip>
+          <Card
+			tooltip={
+									  <>
+										<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
+										{Object.entries(artifacts.find(a => a.name === artifact.name && a.tier === artifact.tier)||{}).map(([key, value]) => {
+										  
+										  return value !== 0 && !["tier", "№"].includes(key) ? (
+											<Typography key={key}>{key}: {value}</Typography>
+										  ) : null;
+										})}
+									  </>
+									}
+		  key={index} variant="outlined" onClick={() => selectArtifact(artifact)} style={{ margin: '0.5px', cursor: 'pointer' }}>
             <div>
               <Typography variant="body1">{artifact.name}</Typography>
               <Typography variant="body2">Тир {artifact.tier}</Typography>
             </div>
           </Card>
+		  </Tooltip>
 		  </Grid>
         ))}
 		
