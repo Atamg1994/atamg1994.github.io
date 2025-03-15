@@ -207,9 +207,9 @@ const ArtifactCalculator = () => {
                 {groupedArtifacts.map((tierArtifacts, tierIndex) => (
                   <Grid item xs={12 / MAX_TIERS} key={tierIndex}>
                     <Typography variant="subtitle1">Тир {tierIndex + 1}</Typography>
-                    {tierArtifacts.map((artifact) => (
+                    {tierArtifacts.map((artifact,index) => (
                       <Card
-                        key={artifact.name}
+                        key={`${artifact.name}-${index}-${tierIndex}`}
                         variant="outlined"
                         onClick={() => selectArtifact(artifact)}
                         style={{ cursor: 'pointer' }}
