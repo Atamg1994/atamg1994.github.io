@@ -258,7 +258,11 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
             />
             <Button variant="contained" onClick={() => saveBuild(buildName)}>Сохранить шаблон</Button>
             <Select
-              onChange={(e) => setSelectedTemplate(e.target.value)}
+              onChange={(e) => {
+				  loadBuild(e.target.value)
+				  setSelectedTemplate(e.target.value)
+				  
+			  }}
               displayEmpty
               variant="outlined"
               fullWidth
