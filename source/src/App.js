@@ -165,7 +165,15 @@ const ArtifactCalculator = () => {
         {selectedArtifacts.map((artifact, index) => (
           <Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
             <Card variant="outlined">
-              <CardContent>
+			<Tooltip>
+              <CardContent tooltip={
+										  <>
+											<Typography variant="h6" gutterBottom>Суммарные характеристики</Typography>
+											{Object.entries(artifact).map(([key, value]) => 
+											  value !== 0 && ![ "tier", "№"].includes(key) && <Typography key={key}>{key}: {value}</Typography>
+											)}
+										  </>
+							}>
                 <Typography variant="h6" align="center">{artifact.name}</Typography>
                 <Select
                   value={artifact.tier}
@@ -181,6 +189,7 @@ const ArtifactCalculator = () => {
                 </Select>
                 <Button variant="contained" color="error" onClick={() => removeArtifact(index)}>Удалить</Button>
               </CardContent>
+			</Tooltip>
             </Card>
           </Grid>
         ))}
