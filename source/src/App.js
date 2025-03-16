@@ -3,7 +3,11 @@ import { useState,useEffect } from "react";
 import { Button, Select, MenuItem, TextField, Card, CardContent, Typography, Grid, Container, Drawer, FormControlLabel, Checkbox } from '@mui/material';
 import Papa from "papaparse";
 import Tooltip from "./Tooltip";
+import { Buffer } from "buffer"; // Для работы с Base64
+import LZString from "lz-string";
 
+const compress = (data) => LZString.compressToEncodedURIComponent(data);
+const decompress = (compressed) => LZString.decompressFromEncodedURIComponent(compressed);
 
 const DEFAULT_ARTIFACTS_CSV = "./artifacts.csv"; // Path to the default CSV file
 const ArtifactCalculator = () => {
@@ -58,9 +62,24 @@ const ArtifactCalculator = () => {
   }, []);
 
 
-  useEffect(() => {
-    loadDefaultArtifacts(); // Load default artifacts on mount
-  }, []);
+
+
+
+useEffect(() => {
+	loadDefaultArtifacts(); // Load default artifacts on mount
+   const params = new URLSearchParams(window.location.search);
+  const compressedBuild = params.get("b");
+  if (compressedBuild) {
+    try {
+      const decompressedData = decompress(compressedBuild);
+      if (decompressedData) {
+        setSelectedArtifacts(JSON.parse(decompressedData));
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки сборки из ссылки", error);
+    }
+  }
+}, []);
 
 
   const selectArtifact = (artifact) => {
@@ -131,6 +150,15 @@ const ArtifactCalculator = () => {
       });
     }
   };
+
+const generateShareableLink = () => {
+  const compressedData = compress(JSON.stringify(selectedArtifacts));
+  const shareableURL = `${window.location.origin}${window.location.pathname}?b=${compressedData}`;
+  navigator.clipboard.writeText(shareableURL).then(() => {
+    alert("Ссылка на сборку скопирована!");
+  });
+};
+
 
 const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
   const key = `${artifact.name} (Тир ${artifact.tier})`;
@@ -273,7 +301,9 @@ const artifactCounts = selectedArtifacts.reduce((acc, artifact) => {
         </Grid>
       <Card variant="outlined">
         <CardContent>
-		<Typography variant="h6" gutterBottom>Количество артефактов ({selectedArtifacts.length})</Typography>
+		<Typography variant="h6" gutterBottom>Количество артефактов ({selectedArtifacts.length})  <Button variant="contained" color="primary" onClick={generateShareableLink}>
+  Поделиться сборкой
+</Button></Typography>
 			{Object.entries(artifactCounts).map(([artifact, count]) => (
 			  <Typography key={artifact}>{artifact}: {count} шт.</Typography>
 			))}

@@ -5,6 +5,15 @@ https://github.com/mholt/PapaParse
 License: MIT
 */
 
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
 /**
  * @license React
  * react-dom-client.production.js
