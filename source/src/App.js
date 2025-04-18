@@ -199,7 +199,14 @@ const ArtifactCalculator = () => {
       Object.entries(filterStats).every(([stat, isChecked]) => !isChecked || (artifact[stat] > 0 || artifact[stat] < 0))
   );
 
-
+const sortedArtifacts = selectedArtifacts
+  .map((artifact, index) => ({ ...artifact, originalIndex: index })) // добавляем оригинальный индекс
+  .sort((a, b) => {
+    if (a.name === b.name) {
+      return b.tier - a.tier; // Сначала более высокий тир
+    }
+    return a.name.localeCompare(b.name); // Сортировка по имени
+  });
 
 
   return (
@@ -259,12 +266,7 @@ const ArtifactCalculator = () => {
 
             <Typography variant="h5" gutterBottom>Калькулятор артефактов</Typography>
             <Grid container spacing={2} className="mb-4">
-              {([...selectedArtifacts].sort((a, b) => {
-                if (a.name === b.name) {
-                  return b.tier - a.tier;
-                }
-                return a.name.localeCompare(b.name);
-              })).map((artifact, index) => (
+              {sortedArtifacts.map((artifact, index) => (
                   <Grid item xs={12 / 4} key={`${artifact.name}-${index}`}>
                     <Card variant="outlined" style={{ margin: '0.5px', cursor: 'pointer' }}>
                       <Tooltip>
@@ -282,7 +284,7 @@ const ArtifactCalculator = () => {
                           <Typography variant="h6" align="center">{artifact.name}</Typography>
                           <Select
                               value={artifact.tier}
-                              onChange={(e) => updateTier(index, e.target.value)}
+                              onChange={(e) => updateTier(artifact.originalIndex, e.target.value)}
                               displayEmpty
                               fullWidth
                               variant="outlined"
@@ -293,7 +295,7 @@ const ArtifactCalculator = () => {
                             ))}
                           </Select>
                           <div style={{ display: 'flex' }}>
-                            <Button variant="contained" color="error" onClick={() => removeArtifact(index)}>Удалить</Button>
+                            <Button variant="contained" color="error" onClick={() => removeArtifact(artifact.originalIndex)}>Удалить</Button>
                             <Button variant="contained" color="error" onClick={() => selectArtifact(artifact)}>+</Button>
                           </div>
 
